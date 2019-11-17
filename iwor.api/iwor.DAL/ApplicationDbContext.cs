@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using iwor.DAL.Models;
+using iwor.core.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

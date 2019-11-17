@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace iwor.DAL.Models
+namespace iwor.core.Entities
 {
     public class Bookmark
     {

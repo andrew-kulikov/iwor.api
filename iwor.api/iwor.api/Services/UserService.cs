@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using iwor.DAL.Models;
+using iwor.core.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace iwor.api.Services

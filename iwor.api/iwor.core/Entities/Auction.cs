@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace iwor.DAL.Models
+namespace iwor.core.Entities
 {
-    public class Auction
+    public class Auction : BaseEntity
     {
-        public Guid Id { get; set; }
         public DateTime Created { get; set; }
         public string Name { get; set; }
         public string LogoUrl { get; set; }

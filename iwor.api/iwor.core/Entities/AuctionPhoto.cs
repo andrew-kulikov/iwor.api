@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace iwor.DAL.Models
+namespace iwor.core.Entities
 {
-    public class AuctionPhoto
+    public class AuctionPhoto : BaseEntity
     {
         public Guid Id { get; set; }
         public string Url { get; set; }
