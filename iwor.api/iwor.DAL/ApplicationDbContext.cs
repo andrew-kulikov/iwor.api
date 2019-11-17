@@ -13,6 +13,9 @@ namespace iwor.DAL
 
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<AuctionClosing> Closings { get; set; }
+        public DbSet<PriceRaise> PriceRaises { get; set; }
+        public DbSet<AuctionPhoto> AuctionPhotos { get; set; }
+        public DbSet<Bookmark> Bookmarks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

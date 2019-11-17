@@ -9,7 +9,7 @@ namespace iwor.DAL.Models
         public Guid AuctionId { get; set; }
         public ApplicationUser Winner { get; set; }
         public string WinnerId { get; set; }
-        public decimal EndPrice { get; set; }
+        public double EndPrice { get; set; }
         public DateTime Closed { get; set; }
     }
 }
