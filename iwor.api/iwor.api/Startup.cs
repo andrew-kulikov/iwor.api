@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using iwor.DAL;
 using iwor.DAL.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -46,7 +48,7 @@ namespace iwor.api
             {
                 config.RequireHttpsMetadata = false;
                 config.SaveToken = true;
-                config.TokenValidationParameters = new TokenValidationParameters()
+                config.TokenValidationParameters = new TokenValidationParameters
                 {
                     IssuerSigningKey = signingKey,
                     ValidateAudience = true,
@@ -60,9 +62,10 @@ namespace iwor.api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
+            await SeedDatabase(app);
 
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
@@ -74,6 +77,38 @@ namespace iwor.api
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        }
+
+        private static async Task SeedDatabase(IApplicationBuilder app)
+        {
+            using var scope = app.ApplicationServices.CreateScope();
+
+            var userManager = (UserManager<ApplicationUser>) scope.ServiceProvider
+                .GetService(typeof(UserManager<ApplicationUser>));
+
+            var roleManager = (RoleManager<IdentityRole>) scope.ServiceProvider
+                .GetService(typeof(RoleManager<IdentityRole>));
+
+            var roles = new List<string> {"Admin", "Company", "User"};
+            roles.ForEach(roleName =>
+            {
+                var roleExists = roleManager.RoleExistsAsync(roleName).Result;
+                if (roleExists) return;
+
+                var role = new IdentityRole {Name = roleName};
+                roleManager.CreateAsync(role).Wait();
+            });
+
+            var admin = await userManager.FindByNameAsync("admin");
+            if (admin == null)
+            {
+                var user = new ApplicationUser {UserName = "admin", Email = "admin@admin.com"};
+                const string password = "123qweA!";
+
+                var result = await userManager.CreateAsync(user, password);
+
+                if (result.Succeeded) await userManager.AddToRoleAsync(user, "Admin");
+            }
         }
 
         private static void UpdateDatabase(IApplicationBuilder app)
