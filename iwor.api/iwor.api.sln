@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iwor.api", "iwor.api\iwor.api.csproj", "{0809720E-C207-4421-8C94-DBB105631D04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iwor.api", "iwor.api\iwor.api.csproj", "{0809720E-C207-4421-8C94-DBB105631D04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iwor.DAL", "iwor.DAL\iwor.DAL.csproj", "{C799E31C-9DAE-452D-83B4-4A8BF317285C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iwor.DAL", "iwor.DAL\iwor.DAL.csproj", "{C799E31C-9DAE-452D-83B4-4A8BF317285C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iwor.core", "iwor.core\iwor.core.csproj", "{28288123-7C0E-47BD-B0C0-863E304CA276}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C799E31C-9DAE-452D-83B4-4A8BF317285C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C799E31C-9DAE-452D-83B4-4A8BF317285C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C799E31C-9DAE-452D-83B4-4A8BF317285C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28288123-7C0E-47BD-B0C0-863E304CA276}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28288123-7C0E-47BD-B0C0-863E304CA276}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28288123-7C0E-47BD-B0C0-863E304CA276}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28288123-7C0E-47BD-B0C0-863E304CA276}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
