@@ -6,12 +6,18 @@ services:
     build:
       context: .
       dockerfile: iwor.api/Dockerfile
+    environment:
+        ASPNETCORE_URLS: "https://+:443;http://+:80"
+        ASPNETCORE_HTTPS_PORT: "44358"
     depends_on:
       - db
+    ports:
+      - "80:5000"
+      - "443:5001"
   db:
-    image: "mcr.microsoft.com/mssql/server"
+    image: "mcr.microsoft.com/mssql/server:2019-GA-ubuntu-16.04"
     environment:
         SA_PASSWORD: "123qweA!"
         ACCEPT_EULA: "Y"
     ports:
-      - "1433:1433"
+      - "1433:32228"
