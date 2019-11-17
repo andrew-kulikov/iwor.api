@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace iwor.api
 {
@@ -59,15 +62,31 @@ namespace iwor.api
                     ValidateIssuerSigningKey = true
                 };
             });
+
+            services.AddSwaggerGen(c =>
+            {
+                //The generated Swagger JSON file will have these properties.
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Swagger XML Api Demo",
+                    Version = "v1",
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.XML";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+                c.IncludeXmlComments(xmlPath);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
-            await SeedDatabase(app);
+            SeedDatabase(app).Wait();
 
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+
 
             app.UseHttpsRedirection();
 
@@ -75,6 +94,9 @@ namespace iwor.api
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"); });
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
