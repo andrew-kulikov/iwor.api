@@ -2,9 +2,8 @@
 
 namespace iwor.core.Entities
 {
-    public class AuctionClosing
+    public class AuctionClosing : BaseEntity
     {
-        public Guid Id { get; set; }
         public Auction Auction { get; set; }
         public Guid AuctionId { get; set; }
         public ApplicationUser Winner { get; set; }

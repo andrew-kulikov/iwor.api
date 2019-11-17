@@ -2,9 +2,8 @@
 
 namespace iwor.core.Entities
 {
-    public class PriceRaise
+    public class PriceRaise : BaseEntity
     {
-        public Guid Id { get; set; }
         public double StartPrice { get; set; }
         public double EndPrice { get; set; }
 
