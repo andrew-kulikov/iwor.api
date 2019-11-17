@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  iwor.api:
+    image: ${DOCKER_REGISTRY-}iworapi
+    build:
+      context: .
+      dockerfile: iwor.api/Dockerfile
+    depends_on:
+      - db
+  db:
+    image: "mcr.microsoft.com/mssql/server"
+    environment:
+        SA_PASSWORD: "123qweA!"
+        ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
