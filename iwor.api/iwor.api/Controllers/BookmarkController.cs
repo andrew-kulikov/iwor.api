@@ -63,7 +63,7 @@ namespace iwor.api.Controllers
 
         [HttpGet]
         [Route("my/{id}")]
-        public async Task<ActionResult> GetById(Guid id)
+        public async Task<ActionResult> GetMyById(Guid id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -77,13 +77,40 @@ namespace iwor.api.Controllers
         [HttpGet]
         [Route("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> GetAnyById(Guid id)
+        public async Task<ActionResult> GetById(Guid id)
         {
             var bookmark = await _repository.GetByIdAsync(id);
 
             if (bookmark == null) return NotFound();
 
             return Ok(bookmark);
+        }
+
+        [HttpDelete]
+        [Route("my/{id}")]
+        public async Task<ActionResult> DeleteMy(Guid id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var result = await _service.DeleteUserBookmark(userId, id);
+
+            if (!result) return NotFound();
+
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> Delete(Guid id)
+        {
+            var bookmark = await _repository.GetByIdAsync(id);
+
+            if (bookmark == null) return NotFound();
+
+            await _repository.DeleteAsync(bookmark);
+
+            return Ok();
         }
     }
 }

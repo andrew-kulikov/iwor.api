@@ -34,5 +34,16 @@ namespace iwor.core.Services
 
             return bookmark;
         }
+
+        public async Task<bool> DeleteUserBookmark(string userId, Guid id)
+        {
+            var bookmark = await GetUserBookmark(userId, id);
+
+            if (bookmark == null) return false;
+
+            await _repository.DeleteAsync(bookmark);
+
+            return true;
+        }
     }
 }
