@@ -36,7 +36,11 @@ namespace iwor.api.Controllers
             _configuration = configuration;
         }
 
-
+        /// <summary>
+        ///     Log into application and receive token
+        /// </summary>
+        /// <param name="loginDto">User authentication private data (login, password)</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("token")]
         public async Task<IActionResult> CreateToken([FromBody] LoginDto loginDto)

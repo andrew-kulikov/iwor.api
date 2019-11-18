@@ -5,7 +5,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using iwor.core.Entities;
+using iwor.core.Repositories;
+using iwor.core.Services;
+using iwor.core.Specifications;
 using iwor.DAL;
+using iwor.DAL.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -77,6 +81,10 @@ namespace iwor.api
 
                 c.IncludeXmlComments(xmlPath);
             });
+
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped(typeof(ISpecification<>), typeof(BaseSpecification<>));
+            services.AddScoped<IAuctionService, AuctionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
