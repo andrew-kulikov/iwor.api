@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace iwor.api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/bookmark")]
     [Authorize]
     public class BookmarkController : ControllerBase
     {

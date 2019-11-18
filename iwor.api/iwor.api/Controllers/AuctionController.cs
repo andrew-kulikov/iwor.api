@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace iwor.api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auction")]
     [Authorize]
     public class AuctionController : ControllerBase
     {
