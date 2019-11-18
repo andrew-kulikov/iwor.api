@@ -61,7 +61,6 @@ namespace iwor.api.Controllers
             auction.OwnerId = userId;
 
             var result = await _repository.AddAsync(auction);
-            result.Owner = null;
 
             return Ok(result);
         }
