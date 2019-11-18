@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
+using iwor.api.DTOs;
 using iwor.core.Entities;
 using iwor.core.Repositories;
 using iwor.core.Services;
@@ -36,6 +37,20 @@ namespace iwor.api.Controllers
             var bookmarks = await _service.GetUserBookmarks(userId);
 
             return Ok(bookmarks);
+        }
+
+        [HttpPost]
+        [Route("my")]
+        public async Task<ActionResult> AddBookmark([FromBody]BookmarkDto bookmarkDto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var bookmark = _mapper.Map<Bookmark>(bookmarkDto);
+            bookmark.UserId = userId;
+
+            var result = await _repository.AddAsync(bookmark);
+
+            return Ok(result);
         }
     }
 }
