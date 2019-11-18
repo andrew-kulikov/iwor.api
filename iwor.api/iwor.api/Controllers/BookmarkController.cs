@@ -30,6 +30,16 @@ namespace iwor.api.Controllers
         }
 
         [HttpGet]
+        [Route("")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> GetAll()
+        {
+            var bookmarks = await _repository.ListAllAsync();
+
+            return Ok(bookmarks);
+        }
+
+        [HttpGet]
         [Route("my")]
         public async Task<ActionResult> GetMy()
         {
