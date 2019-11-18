@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using iwor.core.Entities;
 using iwor.core.Repositories;
 using iwor.core.Services;
@@ -35,6 +36,8 @@ namespace iwor.api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(Startup));
+
             services.AddDbContext<ApplicationDbContext>(c =>
                 c.UseSqlServer(Configuration.GetConnectionString("AuctionDB"),
                     options => options.MigrationsAssembly(typeof(ApplicationDbContext).GetTypeInfo().Assembly.GetName()
@@ -73,8 +76,33 @@ namespace iwor.api
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "Swagger XML Api Demo",
-                    Version = "v1",
+                    Version = "v1"
                 });
+                var securityDefinition = new OpenApiSecurityScheme
+                {
+                    Name = "Bearer",
+                    BearerFormat = "JWT",
+                    Scheme = "bearer",
+                    Description = "Specify the authorization token.",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http
+                };
+                c.AddSecurityDefinition("jwt_auth", securityDefinition);
+
+                // Make sure swagger UI requires a Bearer token specified
+                var securityScheme = new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = "jwt_auth",
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+                var securityRequirements = new OpenApiSecurityRequirement
+                {
+                    {securityScheme, new string[] { }}
+                };
+                c.AddSecurityRequirement(securityRequirements);
 
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.XML";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

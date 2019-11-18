@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoMapper;
 using iwor.api.DTOs;
 using iwor.core.Entities;
 using iwor.core.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,13 +14,16 @@ namespace iwor.api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class AuctionController : ControllerBase
     {
         private readonly IRepository<Auction> _repository;
+        private readonly IMapper _mapper;
 
-        public AuctionController(IRepository<Auction> repository)
+        public AuctionController(IRepository<Auction> repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -44,14 +50,20 @@ namespace iwor.api.Controllers
 
         [HttpPost]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> Add([FromBody] AuctionDto auction)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Auction))]
+        public async Task<ActionResult> Add([FromBody] AuctionDto auctionDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            await _repository.AddAsync(auction);
+            var auction = _mapper.Map<Auction>(auctionDto);
 
-            return Ok();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            auction.OwnerId = userId;
+
+            var result = await _repository.AddAsync(auction);
+            result.Owner = null;
+
+            return Ok(result);
         }
 
         [HttpDelete]

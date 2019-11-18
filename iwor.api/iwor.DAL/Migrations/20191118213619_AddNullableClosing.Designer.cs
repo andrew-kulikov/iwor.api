@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using iwor.DAL;
 
 namespace iwor.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191118213619_AddNullableClosing")]
+    partial class AddNullableClosing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -221,6 +223,9 @@ namespace iwor.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ClosingId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -272,7 +277,8 @@ namespace iwor.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuctionId");
+                    b.HasIndex("AuctionId")
+                        .IsUnique();
 
                     b.HasIndex("WinnerId");
 
@@ -411,8 +417,8 @@ namespace iwor.DAL.Migrations
             modelBuilder.Entity("iwor.core.Entities.AuctionClosing", b =>
                 {
                     b.HasOne("iwor.core.Entities.Auction", "Auction")
-                        .WithMany()
-                        .HasForeignKey("AuctionId")
+                        .WithOne("Closing")
+                        .HasForeignKey("iwor.core.Entities.AuctionClosing", "AuctionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -13,7 +13,5 @@ namespace iwor.core.Entities
         public string OwnerId { get; set; }
         public string Description { get; set; }
         public double StartPrice { get; set; }
-        public AuctionClosing Closing { get; set; }
-        public Guid ClosingId { get; set; }
     }
 }

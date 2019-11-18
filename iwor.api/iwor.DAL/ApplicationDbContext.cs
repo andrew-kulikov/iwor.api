@@ -22,11 +22,6 @@ namespace iwor.DAL
             base.OnModelCreating(builder);
 
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
-            builder.Entity<Auction>()
-                .HasOne(a => a.Closing)
-                .WithOne(c => c.Auction)
-                .HasForeignKey<AuctionClosing>(c => c.AuctionId);
         }
     }
 }
