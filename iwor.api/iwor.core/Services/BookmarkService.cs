@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using iwor.core.Entities;
@@ -18,10 +19,20 @@ namespace iwor.core.Services
 
         public async Task<ICollection<Bookmark>> GetUserBookmarks(string userId)
         {
-            var spec = new UserBookmarkSpecification(userId);
+            var spec = new BookmarkSpecification(b => b.UserId == userId);
             var bookmarks = await _repository.ListAsync(spec);
 
             return bookmarks.ToList();
+        }
+
+        public async Task<Bookmark> GetUserBookmark(string userId, Guid id)
+        {
+            var spec = new BookmarkSpecification(b => b.UserId == userId && b.Id == id);
+
+            var bookmarks = await _repository.ListAsync(spec);
+            var bookmark = bookmarks.FirstOrDefault();
+
+            return bookmark;
         }
     }
 }

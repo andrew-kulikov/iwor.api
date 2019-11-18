@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -18,9 +16,9 @@ namespace iwor.api.Controllers
     [Authorize]
     public class BookmarkController : ControllerBase
     {
-        private readonly IBookmarkService _service;
-        private readonly IRepository<Bookmark> _repository;
         private readonly IMapper _mapper;
+        private readonly IRepository<Bookmark> _repository;
+        private readonly IBookmarkService _service;
 
         public BookmarkController(IRepository<Bookmark> repository, IMapper mapper, IBookmarkService service)
         {
@@ -51,7 +49,7 @@ namespace iwor.api.Controllers
 
         [HttpPost]
         [Route("my")]
-        public async Task<ActionResult> AddBookmark([FromBody]BookmarkDto bookmarkDto)
+        public async Task<ActionResult> AddBookmark([FromBody] BookmarkDto bookmarkDto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -61,6 +59,31 @@ namespace iwor.api.Controllers
             var result = await _repository.AddAsync(bookmark);
 
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("my/{id}")]
+        public async Task<ActionResult> GetById(Guid id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var bookmark = await _service.GetUserBookmark(userId, id);
+
+            if (bookmark == null) return NotFound();
+
+            return Ok(bookmark);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> GetAnyById(Guid id)
+        {
+            var bookmark = await _repository.GetByIdAsync(id);
+
+            if (bookmark == null) return NotFound();
+
+            return Ok(bookmark);
         }
     }
 }
