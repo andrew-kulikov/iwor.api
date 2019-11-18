@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using iwor.core.Entities;
@@ -17,7 +18,7 @@ namespace iwor.DAL.Repositories
             Context = context;
         }
 
-        public virtual async Task<T> GetByIdAsync(int id)
+        public virtual async Task<T> GetByIdAsync(Guid id)
         {
             return await Context.Set<T>().FindAsync(id);
         }
