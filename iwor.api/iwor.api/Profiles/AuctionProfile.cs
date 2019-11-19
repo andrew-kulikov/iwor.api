@@ -21,6 +21,7 @@ namespace iwor.api.Profiles
                 .BeforeMap((s, d) => d.Created = DateTime.Now);
 
             CreateMap<ApplicationUser, UserProfile>();
+            CreateMap<RegisterDto, ApplicationUser>();
         }
     }
 }

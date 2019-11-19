@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace iwor.api.DTOs
 {
@@ -13,5 +14,10 @@ namespace iwor.api.DTOs
             ErrorMessage =
                 "Passwords must be at least 8 characters and contain at 3 of 4 of the following: upper case (A-Z), lower case (a-z), number (0-9) and special character (e.g. !@#$%^&*)")]
         public string PasswordConfirmation { get; set; }
+
+        public DateTime? Birthday { get; set; }
+        public string Address { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }

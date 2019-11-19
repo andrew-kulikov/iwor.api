@@ -2,13 +2,15 @@
 using System.Threading.Tasks;
 using iwor.core.Entities;
 using iwor.core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace iwor.api.Controllers
 {
     [ApiController]
-    [Route("me")]
+    [Route("api/me")]
+    [Authorize]
     public class ProfileController : ControllerBase
     {
         private readonly IUserService _userService;

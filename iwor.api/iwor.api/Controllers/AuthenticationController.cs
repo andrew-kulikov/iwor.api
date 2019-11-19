@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using iwor.api.DTOs;
 using iwor.core.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -24,16 +25,18 @@ namespace iwor.api.Controllers
         private readonly IConfiguration _configuration;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMapper _mapper;
 
 
         public AuthenticationController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IConfiguration configuration)
+            IConfiguration configuration, IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -77,15 +80,8 @@ namespace iwor.api.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var user = new ApplicationUser
-            {
-                //TODO: Add all fields
-                //TODO: Use Automapper instaed of manual binding  
-
-                UserName = registerDto.Username,
-                Email = registerDto.Email,
-                RegistrationDate = DateTime.Now
-            };
+            var user = _mapper.Map<ApplicationUser>(registerDto);
+            user.RegistrationDate = DateTime.Now;
 
             var identityResult = await _userManager.CreateAsync(user, registerDto.Password);
 
