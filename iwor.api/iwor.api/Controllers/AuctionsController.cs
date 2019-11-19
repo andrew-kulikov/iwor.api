@@ -13,14 +13,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace iwor.api.Controllers
 {
     [ApiController]
-    [Route("api/auction")]
+    [Route("api/auctions")]
     [Authorize]
-    public class AuctionController : ControllerBase
+    public class AuctionsController : ControllerBase
     {
-        private readonly IRepository<Auction> _repository;
         private readonly IMapper _mapper;
+        private readonly IRepository<Auction> _repository;
 
-        public AuctionController(IRepository<Auction> repository, IMapper mapper)
+        public AuctionsController(IRepository<Auction> repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
