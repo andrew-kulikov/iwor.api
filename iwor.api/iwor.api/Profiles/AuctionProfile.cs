@@ -9,13 +9,22 @@ namespace iwor.api.Profiles
     {
         public AuctionProfile()
         {
-            CreateMap<AuctionDto, Auction>()
+            CreateMap<NewAuctionDto, Auction>()
                 .BeforeMap((s, d) =>
                 {
                     d.Status = AuctionStatus.Created;
                     d.Created = DateTime.Now;
                 })
                 .ReverseMap();
+
+            CreateMap<AuctionDto, Auction>()
+                .BeforeMap((s, d) =>
+                {
+                    d.Status = AuctionStatus.Created;
+                    d.Created = DateTime.Now;
+                })
+                .ReverseMap()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
             CreateMap<FavoriteDto, Bookmark>()
                 .BeforeMap((s, d) => d.Created = DateTime.Now);

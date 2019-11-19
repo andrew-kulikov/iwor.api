@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using iwor.core.Entities;
 
 namespace iwor.api.DTOs
 {
-    public class AuctionDto
+    public class AuctionDto : NewAuctionDto
     {
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public string Name { get; set; }
-        public string LogoUrl { get; set; }
-        public string Description { get; set; }
-        public double StartPrice { get; set; }
-        public ICollection<string> Images { get; set; }
+        public string OwnerId { get; set; }
+        public string Status { get; set; }
+        public ICollection<PriceRaise> PriceRaises { get; set; }
     }
 }
