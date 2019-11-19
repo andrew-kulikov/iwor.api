@@ -28,7 +28,7 @@ namespace iwor.api.Controllers
         }
 
         [HttpGet]
-        [Route("")]
+        [Route("all")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> GetAll()
         {
@@ -38,7 +38,7 @@ namespace iwor.api.Controllers
         }
 
         [HttpGet]
-        [Route("my")]
+        [Route("")]
         public async Task<ActionResult> GetMy()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -48,7 +48,7 @@ namespace iwor.api.Controllers
         }
 
         [HttpPost]
-        [Route("my")]
+        [Route("")]
         public async Task<ActionResult> AddBookmark([FromBody] BookmarkDto bookmarkDto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -62,7 +62,7 @@ namespace iwor.api.Controllers
         }
 
         [HttpGet]
-        [Route("my/{id}")]
+        [Route("{id}")]
         public async Task<ActionResult> GetMyById(Guid id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -75,7 +75,7 @@ namespace iwor.api.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("all/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> GetById(Guid id)
         {
@@ -87,7 +87,7 @@ namespace iwor.api.Controllers
         }
 
         [HttpDelete]
-        [Route("my/{id}")]
+        [Route("{id}")]
         public async Task<ActionResult> DeleteMy(Guid id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -100,7 +100,7 @@ namespace iwor.api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("all/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(Guid id)
         {
