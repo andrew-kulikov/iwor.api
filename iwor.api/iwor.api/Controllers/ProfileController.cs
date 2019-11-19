@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
+using iwor.api.DTOs;
 using iwor.core.Entities;
 using iwor.core.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -24,26 +25,26 @@ namespace iwor.api.Controllers
 
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult> GetProfile()
+        public async Task<IActionResult> GetProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _userService.GetUserProfile(userId);
+            var profile = await _userService.GetUserProfile(userId);
 
-            return Ok(user);
+            return Ok(ResponseDto<UserProfile>.Ok(profile));
         }
 
         [HttpPut]
         [Route("")]
-        public async Task<ActionResult> UpdateInfo([FromBody] UserProfile profile)
+        public async Task<IActionResult> UpdateInfo([FromBody] UserProfile profile)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             profile.Id = userId;
 
             var result = await _userService.UpdateProfile(profile);
 
-            if (result == null) return BadRequest("Cannot update profile info");
+            if (result == null) return BadRequest( "Cannot update profile info");
 
-            return Ok(result);
+            return Ok(ResponseDto<UserProfile>.Ok(profile));
         }
     }
 }

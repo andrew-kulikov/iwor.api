@@ -29,10 +29,10 @@ namespace iwor.api.Controllers
         [HttpGet]
         [Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ICollection<Auction>))]
-        public async Task<ActionResult> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             var auctions = await _repository.ListAllAsync();
-            return Ok(auctions);
+            return Ok(ResponseDto<IReadOnlyList<Auction>>.Ok(auctions));
         }
 
         [HttpGet]
@@ -45,7 +45,7 @@ namespace iwor.api.Controllers
 
             if (auction == null) return NotFound();
 
-            return Ok(auction);
+            return Ok(ResponseDto<Auction>.Ok(auction));
         }
 
         [HttpPost]
@@ -62,7 +62,7 @@ namespace iwor.api.Controllers
 
             var result = await _repository.AddAsync(auction);
 
-            return Ok(result);
+            return Ok(ResponseDto<Auction>.Ok(auction));
         }
 
         [HttpDelete]
@@ -77,7 +77,7 @@ namespace iwor.api.Controllers
 
             await _repository.DeleteAsync(auction);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

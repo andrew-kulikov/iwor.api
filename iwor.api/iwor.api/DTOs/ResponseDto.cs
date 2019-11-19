@@ -6,7 +6,7 @@ namespace iwor.api.DTOs
     {
         public string Status { get; set; }
         public int Code { get; set; }
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
         public T Result { get; set; }
 
         public static ResponseDto<T> Ok()
