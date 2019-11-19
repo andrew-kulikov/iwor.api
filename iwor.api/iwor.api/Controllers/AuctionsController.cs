@@ -65,6 +65,13 @@ namespace iwor.api.Controllers
             return Ok(ResponseDto<Auction>.Ok(auction));
         }
 
+        [HttpPost]
+        [Route("{id}/raise")]
+        public async Task<ActionResult> RaisePrice([FromBody] AuctionDto auctionDto)
+        {
+            return Ok();
+        }
+
         [HttpDelete]
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
