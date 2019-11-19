@@ -12,15 +12,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace iwor.api.Controllers
 {
     [ApiController]
-    [Route("api/bookmarks")]
+    [Route("api/favorites")]
     [Authorize]
-    public class BookmarksController : ControllerBase
+    public class FavoritesController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IRepository<Bookmark> _repository;
         private readonly IBookmarkService _service;
 
-        public BookmarksController(IRepository<Bookmark> repository, IMapper mapper, IBookmarkService service)
+        public FavoritesController(IRepository<Bookmark> repository, IMapper mapper, IBookmarkService service)
         {
             _repository = repository;
             _mapper = mapper;
