@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace iwor.api.DTOs
+﻿namespace iwor.api.DTOs
 {
-    public class PriceRaiseDto
+    public class PriceRaiseDto : NewPriceRaiseDto
     {
+        public string RaisedUserId { get; set; }
     }
 }

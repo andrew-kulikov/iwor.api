@@ -44,7 +44,7 @@ namespace iwor.api.Controllers
             {
                 var dto = _mapper.Map<AuctionDto>(auction);
                 var raises = await _raiseRepository.ListAsync(new AuctionPriceRaiseSpecification(pr => pr.AuctionId == auction.Id));
-                dto.PriceRaises = raises.ToList();
+                dto.PriceRaises = _mapper.Map<ICollection<PriceRaiseDto>>(raises);
 
                 lock (results) { results.Add(dto); }
             }
@@ -64,7 +64,7 @@ namespace iwor.api.Controllers
 
             var dto = _mapper.Map<AuctionDto>(auction);
             var raises = await _raiseRepository.ListAsync(new AuctionPriceRaiseSpecification(pr => pr.AuctionId == id));
-            dto.PriceRaises = raises.ToList();
+            dto.PriceRaises = _mapper.Map<ICollection<PriceRaiseDto>>(raises);
 
             return Ok(ResponseDto<Auction>.Ok(auction));
         }
@@ -88,9 +88,19 @@ namespace iwor.api.Controllers
 
         [HttpPost]
         [Route("{id}/raise")]
-        public async Task<ActionResult> RaisePrice()
+        public async Task<ActionResult> RaisePrice(Guid id, [FromBody] NewPriceRaiseDto newPriceRaiseDto)
         {
-            return Ok();
+            var raise = _mapper.Map<PriceRaise>(newPriceRaiseDto);
+
+            raise.RaisedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            raise.AuctionId = id;
+
+            var result = await _raiseRepository.AddAsync(raise);
+
+            if (result == null) return BadRequest();
+
+            var resultDto = _mapper.Map<PriceRaiseDto>(result);
+            return Ok(ResponseDto<PriceRaiseDto>.Ok(resultDto));
         }
 
         [HttpDelete]

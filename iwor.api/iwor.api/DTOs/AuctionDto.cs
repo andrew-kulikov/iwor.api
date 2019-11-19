@@ -7,6 +7,6 @@ namespace iwor.api.DTOs
     {
         public string OwnerId { get; set; }
         public string Status { get; set; }
-        public ICollection<PriceRaise> PriceRaises { get; set; }
+        public ICollection<PriceRaiseDto> PriceRaises { get; set; }
     }
 }

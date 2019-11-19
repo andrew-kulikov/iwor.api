@@ -31,6 +31,8 @@ namespace iwor.api.Profiles
 
             CreateMap<ApplicationUser, UserProfile>();
             CreateMap<RegisterDto, ApplicationUser>();
+            CreateMap<PriceRaiseDto, PriceRaise>().ReverseMap();
+            CreateMap<NewPriceRaiseDto, PriceRaise>().ReverseMap();
         }
     }
 }
