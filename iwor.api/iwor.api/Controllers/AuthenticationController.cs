@@ -56,7 +56,9 @@ namespace iwor.api.Controllers
 
             var user = await _userManager.FindByNameAsync(loginDto.Username);
 
-            return Ok(GetToken(user));
+            var token = new TokenDto { Token = GetToken(user) };
+
+            return Ok(ResponseDto<TokenDto>.Ok(token));
         }
 
         [Authorize]
@@ -68,7 +70,10 @@ namespace iwor.api.Controllers
                 User.Identity.Name ??
                 User.Claims.Where(c => c.Properties.ContainsKey("unique_name")).Select(c => c.Value).FirstOrDefault()
             );
-            return Ok(GetToken(user));
+
+            var token = new TokenDto { Token = GetToken(user) };
+
+            return Ok(ResponseDto<TokenDto>.Ok(token));
         }
 
 
@@ -88,7 +93,9 @@ namespace iwor.api.Controllers
 
             await _signInManager.SignInAsync(user, false);
 
-            return Ok(GetToken(user));
+            var token = new TokenDto {Token = GetToken(user)};
+
+            return Ok(ResponseDto<TokenDto>.Ok(token));
         }
 
         [Authorize]
