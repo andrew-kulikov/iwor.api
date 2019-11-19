@@ -112,8 +112,10 @@ namespace iwor.api
 
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped(typeof(ISpecification<>), typeof(BaseSpecification<>));
+
             services.AddScoped<IAuctionService, AuctionService>();
             services.AddScoped<IBookmarkService, BookmarkService>();
+            services.AddScoped<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

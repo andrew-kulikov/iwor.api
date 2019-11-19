@@ -1,0 +1,33 @@
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
+using iwor.core.Entities;
+using iwor.core.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+
+namespace iwor.api.Controllers
+{
+    [ApiController]
+    [Route("me")]
+    public class ProfileController : ControllerBase
+    {
+        private readonly IUserService _userService;
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public ProfileController(UserManager<ApplicationUser> userManager, IUserService userService)
+        {
+            _userManager = userManager;
+            _userService = userService;
+        }
+
+        [HttpGet]
+        [Route("")]
+        public async Task<ActionResult> GetProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userService.GetUserProfile(userId);
+
+            return Ok(user);
+        }
+    }
+}

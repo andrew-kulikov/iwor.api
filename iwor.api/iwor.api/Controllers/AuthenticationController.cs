@@ -83,7 +83,8 @@ namespace iwor.api.Controllers
                 //TODO: Use Automapper instaed of manual binding  
 
                 UserName = registerDto.Username,
-                Email = registerDto.Email
+                Email = registerDto.Email,
+                RegistrationDate = DateTime.Now
             };
 
             var identityResult = await _userManager.CreateAsync(user, registerDto.Password);

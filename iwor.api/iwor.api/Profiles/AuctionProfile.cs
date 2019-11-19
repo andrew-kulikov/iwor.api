@@ -19,6 +19,8 @@ namespace iwor.api.Profiles
 
             CreateMap<FavoriteDto, Bookmark>()
                 .BeforeMap((s, d) => d.Created = DateTime.Now);
+
+            CreateMap<ApplicationUser, UserProfile>();
         }
     }
 }
