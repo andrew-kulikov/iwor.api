@@ -17,7 +17,7 @@ namespace iwor.api.Profiles
                 })
                 .ReverseMap();
 
-            CreateMap<BookmarkDto, Bookmark>()
+            CreateMap<FavoriteDto, Bookmark>()
                 .BeforeMap((s, d) => d.Created = DateTime.Now);
         }
     }

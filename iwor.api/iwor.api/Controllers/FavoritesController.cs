@@ -49,11 +49,11 @@ namespace iwor.api.Controllers
 
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult> AddBookmark([FromBody] BookmarkDto bookmarkDto)
+        public async Task<ActionResult> AddBookmark([FromBody] FavoriteDto favoriteDto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var bookmark = _mapper.Map<Bookmark>(bookmarkDto);
+            var bookmark = _mapper.Map<Bookmark>(favoriteDto);
             bookmark.UserId = userId;
 
             var result = await _repository.AddAsync(bookmark);
