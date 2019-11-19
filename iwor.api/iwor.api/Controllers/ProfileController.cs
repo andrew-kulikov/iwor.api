@@ -31,5 +31,19 @@ namespace iwor.api.Controllers
 
             return Ok(user);
         }
+
+        [HttpPut]
+        [Route("")]
+        public async Task<ActionResult> UpdateInfo([FromBody] UserProfile profile)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            profile.Id = userId;
+
+            var result = await _userService.UpdateProfile(profile);
+
+            if (result == null) return BadRequest("Cannot update profile info");
+
+            return Ok(result);
+        }
     }
 }

@@ -25,5 +25,14 @@ namespace iwor.core.Services
 
             return profile;
         }
+
+        public async Task<UserProfile> UpdateProfile(UserProfile profile)
+        {
+            var user = _mapper.Map<ApplicationUser>(profile);
+
+            var result = await  _userManager.UpdateAsync(user);
+
+            return result.Succeeded ? profile : null;
+        }
     }
 }

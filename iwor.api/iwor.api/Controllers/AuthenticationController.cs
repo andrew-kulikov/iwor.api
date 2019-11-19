@@ -27,7 +27,6 @@ namespace iwor.api.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
-
         public AuthenticationController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
@@ -90,6 +89,21 @@ namespace iwor.api.Controllers
             await _signInManager.SignInAsync(user, false);
 
             return Ok(GetToken(user));
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("changepassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] PasswordChangeDto passwordChangeDto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+
+            var result = await _userManager.ChangePasswordAsync(user, passwordChangeDto.CurrentPassword, passwordChangeDto.NewPassword);
+
+            if (result.Succeeded) return Ok();
+
+            return Problem();
         }
 
         private string GetToken(IdentityUser user)
