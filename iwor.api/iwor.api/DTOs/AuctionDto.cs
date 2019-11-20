@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace iwor.api.DTOs
 {
@@ -9,5 +10,6 @@ namespace iwor.api.DTOs
         public string OwnerId { get; set; }
         public string Status { get; set; }
         public ICollection<PriceRaiseDto> PriceRaises { get; set; }
+        public double CurrentPrice => PriceRaises.Max(r => r.EndPrice);
     }
 }
