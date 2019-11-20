@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -170,6 +171,77 @@ namespace iwor.api
 
                 if (result.Succeeded) await userManager.AddToRoleAsync(user, "Admin");
             }
+
+            SeedAuctions(app);
+        }
+
+        private static void SeedAuctions(IApplicationBuilder app)
+        {
+            using var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope();
+            using var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
+
+            var auctions = new List<Auction>
+            {
+                new Auction
+                {
+                    Status = AuctionStatus.Open,
+                    Name = "Mazda e433",
+                    Created = DateTime.Now,
+                    Description = "Super azaza kekek",
+                    EndDate = DateTime.Now.AddDays(10),
+                    OwnerId = "3f8bd60c-3c35-44f8-8d81-070700193f9f",
+                    StartPrice = 1000,
+                    LogoUrl = "https://cdn.pixabay.com/photo/2018/05/28/22/11/message-in-a-bottle-3437294_1280.jpg"
+                },
+                new Auction
+                {
+                    Status = AuctionStatus.Open,
+                    Name = "Butylka 228",
+                    Created = DateTime.Now,
+                    Description = "Erwin 123 business",
+                    EndDate = DateTime.Now.AddDays(12),
+                    OwnerId = "3f8bd60c-3c35-44f8-8d81-070700193f9f",
+                    StartPrice = 1200,
+                    LogoUrl = "https://cdn.pixabay.com/photo/2014/12/12/22/08/glass-565914_960_720.jpg"
+                }
+            };
+
+            foreach (var auction in auctions)
+                if (context.Auctions.ToList().All(a => a.Name != auction.Name))
+                {
+                    var newAuction = context.Auctions.Add(auction);
+
+                    var sp = newAuction.Entity.StartPrice;
+                    var raise = new PriceRaise
+                    {
+                        AuctionId = newAuction.Entity.Id,
+                        StartPrice = sp,
+                        RaisedUserId = "c1b813ee-c8c1-4381-899d-fae37c51812b",
+                        EndPrice = sp + 200
+                    };
+                    var raise2 = new PriceRaise
+                    {
+                        AuctionId = newAuction.Entity.Id,
+                        StartPrice = sp + 200,
+                        RaisedUserId = "c1b813ee-c8c1-4381-899d-fae37c51812b",
+                        EndPrice = sp + 322
+                    };
+                    var raise3 = new PriceRaise
+                    {
+                        AuctionId = newAuction.Entity.Id,
+                        StartPrice = sp + 322,
+                        RaisedUserId = "c1b813ee-c8c1-4381-899d-fae37c51812b",
+                        EndPrice = sp + 550
+                    };
+
+                    context.SaveChanges();
+
+                    context.PriceRaises.AddRange(new List<PriceRaise> {raise, raise3, raise2});
+
+                    context.SaveChanges();
+                }
         }
 
         private static void UpdateDatabase(IApplicationBuilder app)

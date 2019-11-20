@@ -23,6 +23,7 @@ namespace iwor.api.Profiles
                     d.Status = AuctionStatus.Created;
                     d.Created = DateTime.Now;
                 })
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Enum.Parse<AuctionStatus>(src.Status)))
                 .ReverseMap()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
