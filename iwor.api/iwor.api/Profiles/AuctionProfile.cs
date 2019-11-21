@@ -55,12 +55,14 @@ namespace iwor.api.Profiles
                     d.FirstName ??= string.Empty;
                     d.LastName ??= string.Empty;
                 })
-                .ForMember(dest => dest.RegistrationDate, opt => opt.MapFrom(src => src.RegistrationDate.ToString(df, CultureInfo.InvariantCulture)))
+                .ForMember(dest => dest.RegistrationDate,
+                    opt => opt.MapFrom(src => src.RegistrationDate.ToString(df, CultureInfo.InvariantCulture)))
                 .ReverseMap()
                 .ForMember(dest => dest.Birthday,
                     opt => opt.MapFrom(src => DateTime.ParseExact(src.Birthday, df, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.RegistrationDate,
-                    opt => opt.MapFrom(src => DateTime.ParseExact(src.RegistrationDate, df, CultureInfo.InvariantCulture)));
+                    opt => opt.MapFrom(src =>
+                        DateTime.ParseExact(src.RegistrationDate, df, CultureInfo.InvariantCulture)));
             CreateMap<RegisterDto, ApplicationUser>()
                 .ForMember(dest => dest.Birthday,
                     opt => opt.MapFrom(src => DateTime.ParseExact(src.Birthday, df, CultureInfo.InvariantCulture)))
@@ -70,7 +72,14 @@ namespace iwor.api.Profiles
                         src => src.Birthday.HasValue
                             ? src.Birthday.Value.ToString(df, CultureInfo.InvariantCulture)
                             : null));
-            CreateMap<PriceRaiseDto, PriceRaise>().ReverseMap();
+
+            CreateMap<PriceRaiseDto, PriceRaise>()
+                .ForMember(dest => dest.Date,
+                    opt => opt.MapFrom(src => DateTime.ParseExact(src.Date, df, CultureInfo.InvariantCulture)))
+                .ReverseMap()
+                .ForMember(dest => dest.Date,
+                    opt => opt.MapFrom(src => src.Date.ToString(df, CultureInfo.InvariantCulture)));
+
             CreateMap<NewPriceRaiseDto, PriceRaise>().ReverseMap();
         }
     }
