@@ -66,7 +66,7 @@ namespace iwor.api.Controllers
             var raises = await _raiseRepository.ListAsync(new AuctionPriceRaiseSpecification(pr => pr.AuctionId == id));
             dto.PriceRaises = _mapper.Map<ICollection<PriceRaiseDto>>(raises);
 
-            return Ok(ResponseDto<Auction>.Ok(auction));
+            return Ok(ResponseDto<AuctionDto>.Ok(dto));
         }
 
         [HttpPost]

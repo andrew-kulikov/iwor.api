@@ -9,7 +9,7 @@ namespace iwor.api.DTOs
         public Guid Id { get; set; }
         public string OwnerId { get; set; }
         public string Status { get; set; }
-        public ICollection<PriceRaiseDto> PriceRaises { get; set; }
-        public double CurrentPrice => PriceRaises.Max(r => r.EndPrice);
+        public ICollection<PriceRaiseDto> PriceRaises { get; set; } = new List<PriceRaiseDto>();
+        public double CurrentPrice => PriceRaises.Any() ? PriceRaises.Max(r => r.EndPrice) : StartPrice;
     }
 }
