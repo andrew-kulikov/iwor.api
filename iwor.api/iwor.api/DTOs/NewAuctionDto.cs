@@ -10,6 +10,5 @@ namespace iwor.api.DTOs
         public string LogoUrl { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public double StartPrice { get; set; }
-        public ICollection<string> Images { get; set; }
     }
 }
