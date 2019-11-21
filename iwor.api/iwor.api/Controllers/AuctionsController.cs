@@ -71,7 +71,7 @@ namespace iwor.api.Controllers
 
         [HttpPost]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Auction))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuctionDto))]
         public async Task<ActionResult> Add([FromBody] NewAuctionDto newAuctionDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -83,7 +83,9 @@ namespace iwor.api.Controllers
 
             var result = await _repository.AddAsync(auction);
 
-            return Ok(ResponseDto<Auction>.Ok(auction));
+            var dto = _mapper.Map<AuctionDto>(result);
+
+            return Ok(ResponseDto<AuctionDto>.Ok(dto));
         }
 
         [HttpPost]
@@ -94,6 +96,7 @@ namespace iwor.api.Controllers
 
             raise.RaisedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             raise.AuctionId = id;
+            raise.Date = DateTime.Now;
 
             var result = await _raiseRepository.AddAsync(raise);
 

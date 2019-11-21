@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -7,6 +9,7 @@ using iwor.core.Entities;
 using iwor.core.Repositories;
 using iwor.core.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace iwor.api.Controllers
@@ -39,12 +42,14 @@ namespace iwor.api.Controllers
 
         [HttpGet]
         [Route("")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuctionDto))]
         public async Task<ActionResult> GetMy()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var bookmarks = await _service.GetUserBookmarks(userId);
+            var favoriteAuctions = bookmarks.Select(b => _mapper.Map<AuctionDto>(b.Auction));
 
-            return Ok(bookmarks);
+            return Ok(ResponseDto<IEnumerable<AuctionDto>>.Ok(favoriteAuctions));
         }
 
         [HttpPost]
@@ -58,11 +63,13 @@ namespace iwor.api.Controllers
 
             var result = await _repository.AddAsync(bookmark);
 
-            return Ok(result);
+            return Ok(ResponseDto<Bookmark>.Ok(result));
         }
 
         [HttpGet]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuctionDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetMyById(Guid id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -71,7 +78,9 @@ namespace iwor.api.Controllers
 
             if (bookmark == null) return NotFound();
 
-            return Ok(bookmark);
+            var auction = _mapper.Map<AuctionDto>(bookmark.Auction);
+
+            return Ok(ResponseDto<AuctionDto>.Ok(auction));
         }
 
         [HttpGet]
@@ -83,7 +92,9 @@ namespace iwor.api.Controllers
 
             if (bookmark == null) return NotFound();
 
-            return Ok(bookmark);
+            var auction = _mapper.Map<AuctionDto>(bookmark.Auction);
+
+            return Ok(ResponseDto<AuctionDto>.Ok(auction));
         }
 
         [HttpDelete]
@@ -96,7 +107,7 @@ namespace iwor.api.Controllers
 
             if (!result) return NotFound();
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete]

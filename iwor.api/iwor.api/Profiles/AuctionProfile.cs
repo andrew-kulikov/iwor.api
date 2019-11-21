@@ -54,6 +54,8 @@ namespace iwor.api.Profiles
                     d.Address ??= string.Empty;
                     d.FirstName ??= string.Empty;
                     d.LastName ??= string.Empty;
+                    d.CardNumber ??= string.Empty;
+                    d.ImageUrl ??= string.Empty;
                 })
                 .ForMember(dest => dest.RegistrationDate,
                     opt => opt.MapFrom(src => src.RegistrationDate.ToString(df, CultureInfo.InvariantCulture)))
@@ -81,6 +83,8 @@ namespace iwor.api.Profiles
                     opt => opt.MapFrom(src => src.Date.ToString(df, CultureInfo.InvariantCulture)));
 
             CreateMap<NewPriceRaiseDto, PriceRaise>().ReverseMap();
+
+            CreateMap<UpdateProfileDto, UserProfile>();
         }
     }
 }

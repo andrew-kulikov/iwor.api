@@ -9,6 +9,6 @@ namespace iwor.core.Services
     {
         Task<ICollection<Bookmark>> GetUserBookmarks(string userId);
         Task<Bookmark> GetUserBookmark(string userId, Guid id);
-        Task<bool> DeleteUserBookmark(string userId, Guid id);
+        Task<bool> DeleteUserBookmark(string userId, Guid auctionId);
     }
 }
