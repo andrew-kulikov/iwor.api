@@ -6,7 +6,7 @@ namespace iwor.core.Entities
     {
         public double StartPrice { get; set; }
         public double EndPrice { get; set; }
-
+        public DateTime Date { get; set; }
         public Auction Auction { get; set; }
         public Guid AuctionId { get; set; }
 
