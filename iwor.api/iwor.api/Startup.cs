@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using iwor.api.Providers;
 using iwor.core.Entities;
 using iwor.core.Repositories;
 using iwor.core.Services;
@@ -117,6 +118,8 @@ namespace iwor.api
             services.AddScoped<IAuctionService, AuctionService>();
             services.AddScoped<IBookmarkService, BookmarkService>();
             services.AddScoped<IUserService, UserService>();
+
+            services.AddSingleton<IConstantsProvider, ConstantsProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -172,10 +175,12 @@ namespace iwor.api
                 if (result.Succeeded) await userManager.AddToRoleAsync(user, "Admin");
             }
 
-            SeedAuctions(app);
+            admin = await userManager.FindByNameAsync("admin");
+
+            SeedAuctions(app, admin);
         }
 
-        private static void SeedAuctions(IApplicationBuilder app)
+        private static void SeedAuctions(IApplicationBuilder app, ApplicationUser user)
         {
             using var serviceScope = app.ApplicationServices
                 .GetRequiredService<IServiceScopeFactory>()
@@ -191,7 +196,7 @@ namespace iwor.api
                     Created = DateTime.Now,
                     Description = "Super azaza kekek",
                     EndDate = DateTime.Now.AddDays(10),
-                    OwnerId = "3f8bd60c-3c35-44f8-8d81-070700193f9f",
+                    OwnerId = user.Id,
                     StartPrice = 1000,
                     LogoUrl = "https://cdn.pixabay.com/photo/2018/05/28/22/11/message-in-a-bottle-3437294_1280.jpg"
                 },
@@ -202,7 +207,7 @@ namespace iwor.api
                     Created = DateTime.Now,
                     Description = "Erwin 123 business",
                     EndDate = DateTime.Now.AddDays(12),
-                    OwnerId = "3f8bd60c-3c35-44f8-8d81-070700193f9f",
+                    OwnerId = user.Id,
                     StartPrice = 1200,
                     LogoUrl = "https://cdn.pixabay.com/photo/2014/12/12/22/08/glass-565914_960_720.jpg"
                 }
@@ -218,21 +223,21 @@ namespace iwor.api
                     {
                         AuctionId = newAuction.Entity.Id,
                         StartPrice = sp,
-                        RaisedUserId = "c1b813ee-c8c1-4381-899d-fae37c51812b",
+                        RaisedUserId = user.Id,
                         EndPrice = sp + 200
                     };
                     var raise2 = new PriceRaise
                     {
                         AuctionId = newAuction.Entity.Id,
                         StartPrice = sp + 200,
-                        RaisedUserId = "c1b813ee-c8c1-4381-899d-fae37c51812b",
+                        RaisedUserId = user.Id,
                         EndPrice = sp + 322
                     };
                     var raise3 = new PriceRaise
                     {
                         AuctionId = newAuction.Entity.Id,
                         StartPrice = sp + 322,
-                        RaisedUserId = "c1b813ee-c8c1-4381-899d-fae37c51812b",
+                        RaisedUserId = user.Id,
                         EndPrice = sp + 550
                     };
 
