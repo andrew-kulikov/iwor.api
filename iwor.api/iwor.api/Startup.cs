@@ -23,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 
 namespace iwor.api
 {
@@ -49,28 +50,30 @@ namespace iwor.api
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"]));
             services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(config =>
-            {
-                config.RequireHttpsMetadata = false;
-                config.SaveToken = true;
-                config.TokenValidationParameters = new TokenValidationParameters
                 {
-                    IssuerSigningKey = signingKey,
-                    ValidateAudience = true,
-                    ValidAudience = Configuration["Tokens:Audience"],
-                    ValidateIssuer = true,
-                    ValidIssuer = Configuration["Tokens:Issuer"],
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true
-                };
-            });
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(config =>
+                {
+                    config.RequireHttpsMetadata = false;
+                    config.SaveToken = true;
+                    config.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        IssuerSigningKey = signingKey,
+                        ValidateAudience = true,
+                        ValidAudience = Configuration["Tokens:Audience"],
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration["Tokens:Issuer"],
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true
+                    };
+                });
 
             services.AddSwaggerGen(c =>
             {
@@ -89,6 +92,7 @@ namespace iwor.api
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http
                 };
+
                 c.AddSecurityDefinition("jwt_auth", securityDefinition);
 
                 // Make sure swagger UI requires a Bearer token specified

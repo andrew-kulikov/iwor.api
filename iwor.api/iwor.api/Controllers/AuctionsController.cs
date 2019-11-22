@@ -35,7 +35,8 @@ namespace iwor.api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ICollection<AuctionDto>))]
         public async Task<IActionResult> GetAll([FromQuery] AuctionStatus? status, [FromQuery] string userId)
         {
-            var auctions = await _repository.ListAllAsync();
+            var spec = new AuctionSpecification(status, userId);
+            var auctions = await _repository.ListAsync(spec);
 
             var results = new List<AuctionDto>();
 
