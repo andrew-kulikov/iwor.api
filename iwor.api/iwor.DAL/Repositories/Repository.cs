@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace iwor.DAL.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : BaseEntity
+    public class Repository<T> : IRepository<T> where T : class
     {
         protected readonly ApplicationDbContext Context;
 

@@ -18,10 +18,8 @@ namespace iwor.core.Services
         public async Task<UserProfile> GetUserProfile(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            var roles = await _userManager.GetRolesAsync(user);
 
             var profile = _mapper.Map<UserProfile>(user);
-            profile.Roles = roles;
 
             return profile;
         }
