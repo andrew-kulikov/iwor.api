@@ -6,8 +6,12 @@ namespace iwor.core.Specifications
 {
     public class AuctionPriceRaiseSpecification : BaseSpecification<PriceRaise>
     {
-        public AuctionPriceRaiseSpecification(Expression<Func<PriceRaise, bool>> criteria) : base(criteria)
+        public AuctionPriceRaiseSpecification(string raiserId = null, Guid? auctionId = null)
         {
+            AddInclude(r => r.Auction);
+
+            if (auctionId != null) AddCriteria(r => r.AuctionId == auctionId);
+            if (raiserId != null) AddCriteria(r => r.RaisedUserId == raiserId);
         }
     }
 }

@@ -6,6 +6,7 @@ using AutoMapper;
 using iwor.api.DTOs;
 using iwor.core.Entities;
 using iwor.core.Repositories;
+using iwor.core.Services;
 using iwor.core.Specifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,42 +19,63 @@ namespace iwor.api.Controllers
     [Authorize]
     public class AuctionsController : ControllerBase
     {
+        private readonly IAuctionService _auctionService;
         private readonly IMapper _mapper;
         private readonly IRepository<PriceRaise> _raiseRepository;
         private readonly IRepository<Auction> _repository;
 
         public AuctionsController(IRepository<Auction> repository, IMapper mapper,
-            IRepository<PriceRaise> raiseRepository)
+            IRepository<PriceRaise> raiseRepository, IAuctionService auctionService)
         {
             _repository = repository;
             _mapper = mapper;
             _raiseRepository = raiseRepository;
+            _auctionService = auctionService;
         }
 
         [HttpGet]
         [Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ICollection<AuctionDto>))]
-        public async Task<IActionResult> GetAll([FromQuery] AuctionStatus? status, [FromQuery] string userId, [FromQuery] string filter)
+        public async Task<IActionResult> GetAll([FromQuery] AuctionStatus? status, [FromQuery] string userId,
+            [FromQuery] string filter)
         {
             var spec = new AuctionSpecification(status, userId, filter);
             var auctions = await _repository.ListAsync(spec);
 
+            var dtos = await GetDtos(auctions);
+
+            return Ok(ResponseDto<ICollection<AuctionDto>>.Ok(dtos));
+        }
+
+        [HttpGet]
+        [Route("active")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ICollection<AuctionDto>))]
+        public async Task<IActionResult> GetActive()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var auctions = await _auctionService.GetUserActiveAuctions(userId);
+
+            var dtos = await GetDtos(auctions);
+
+            return Ok(ResponseDto<ICollection<AuctionDto>>.Ok(dtos));
+        }
+
+        private async Task<ICollection<AuctionDto>> GetDtos(IEnumerable<Auction> auctions)
+        {
             var results = new List<AuctionDto>();
 
             foreach (var auction in auctions)
             {
+                var raises = await _raiseRepository
+                    .ListAsync(new AuctionPriceRaiseSpecification(auctionId: auction.Id));
+
                 var dto = _mapper.Map<AuctionDto>(auction);
-                var raises = await _raiseRepository.ListAsync(
-                    new AuctionPriceRaiseSpecification(pr => pr.AuctionId == auction.Id));
                 dto.PriceRaises = _mapper.Map<ICollection<PriceRaiseDto>>(raises);
 
-                lock (results)
-                {
-                    results.Add(dto);
-                }
+                results.Add(dto);
             }
 
-            return Ok(ResponseDto<List<AuctionDto>>.Ok(results));
+            return results;
         }
 
         [HttpGet]
@@ -67,7 +89,7 @@ namespace iwor.api.Controllers
             if (auction == null) return NotFound();
 
             var dto = _mapper.Map<AuctionDto>(auction);
-            var raises = await _raiseRepository.ListAsync(new AuctionPriceRaiseSpecification(pr => pr.AuctionId == id));
+            var raises = await _raiseRepository.ListAsync(new AuctionPriceRaiseSpecification(auctionId: auction.Id));
             dto.PriceRaises = _mapper.Map<ICollection<PriceRaiseDto>>(raises);
 
             return Ok(ResponseDto<AuctionDto>.Ok(dto));
