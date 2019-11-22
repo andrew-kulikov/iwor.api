@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -34,7 +33,7 @@ namespace iwor.api.Controllers
         [HttpGet]
         [Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ICollection<AuctionDto>))]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] AuctionStatus? status, [FromQuery] string userId)
         {
             var auctions = await _repository.ListAllAsync();
 
@@ -43,10 +42,14 @@ namespace iwor.api.Controllers
             foreach (var auction in auctions)
             {
                 var dto = _mapper.Map<AuctionDto>(auction);
-                var raises = await _raiseRepository.ListAsync(new AuctionPriceRaiseSpecification(pr => pr.AuctionId == auction.Id));
+                var raises = await _raiseRepository.ListAsync(
+                    new AuctionPriceRaiseSpecification(pr => pr.AuctionId == auction.Id));
                 dto.PriceRaises = _mapper.Map<ICollection<PriceRaiseDto>>(raises);
 
-                lock (results) { results.Add(dto); }
+                lock (results)
+                {
+                    results.Add(dto);
+                }
             }
 
             return Ok(ResponseDto<List<AuctionDto>>.Ok(results));
