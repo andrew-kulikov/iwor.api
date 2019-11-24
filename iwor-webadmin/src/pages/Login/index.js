@@ -95,17 +95,6 @@ class LoginPage extends React.Component {
             >
               Sign in
             </Button>
-            <div className={classes.or}> 
-              <Typography>Or</Typography>
-            </div>
-            <Button
-              onClick={() => this.props.history.replace('/register')}
-              fullWidth
-              variant="contained"
-              color="primary"
-            >
-              Register
-            </Button>
           </form>
         </Paper>
       </main>
