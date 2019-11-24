@@ -23,9 +23,9 @@ namespace iwor.api.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IMapper _mapper;
 
         public AuthenticationController(
             UserManager<ApplicationUser> userManager,
@@ -56,7 +56,7 @@ namespace iwor.api.Controllers
 
             var user = await _userManager.FindByNameAsync(loginDto.Username);
 
-            var token = new TokenDto { Token = GetToken(user) };
+            var token = new TokenDto {Token = GetToken(user)};
 
             return Ok(ResponseDto<TokenDto>.Ok(token));
         }
@@ -71,7 +71,7 @@ namespace iwor.api.Controllers
                 User.Claims.Where(c => c.Properties.ContainsKey("unique_name")).Select(c => c.Value).FirstOrDefault()
             );
 
-            var token = new TokenDto { Token = GetToken(user) };
+            var token = new TokenDto {Token = GetToken(user)};
 
             return Ok(ResponseDto<TokenDto>.Ok(token));
         }
@@ -82,7 +82,8 @@ namespace iwor.api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (registerDto.Password != registerDto.PasswordConfirmation)
+                return StatusCode(400, ResponseDto<int>.BadRequest("Пароли не совпадают"));
 
             var user = _mapper.Map<ApplicationUser>(registerDto);
             user.RegistrationDate = DateTime.Now;
@@ -101,16 +102,22 @@ namespace iwor.api.Controllers
         [Authorize]
         [HttpPost]
         [Route("changepassword")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> ChangePassword([FromBody] PasswordChangeDto passwordChangeDto)
         {
+            if (passwordChangeDto.NewPassword != passwordChangeDto.NewPasswordConfirmation)
+                return StatusCode(400, ResponseDto<int>.BadRequest("Пароли не совпадают"));
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _userManager.FindByIdAsync(userId);
 
-            var result = await _userManager.ChangePasswordAsync(user, passwordChangeDto.CurrentPassword, passwordChangeDto.NewPassword);
+            var result = await _userManager.ChangePasswordAsync(user, passwordChangeDto.CurrentPassword,
+                passwordChangeDto.NewPassword);
 
-            if (result.Succeeded) return Ok();
+            if (result.Succeeded) return Ok(ResponseDto<int>.Ok());
 
-            return Problem();
+            return StatusCode(400, ResponseDto<int>.BadRequest("Неверный текущий пароль"));
         }
 
         private string GetToken(IdentityUser user)

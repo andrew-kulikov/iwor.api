@@ -66,5 +66,26 @@ namespace iwor.api.Controllers
 
             return Ok(ResponseDto<UserProfile>.Ok(profile));
         }
+
+        [HttpPost]
+        [Route("balance")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserProfile))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AddIncome([FromBody] AddBalanceDto income)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            user.Balance += income.Income;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded) return BadRequest("Cannot update profile info");
+
+            var profile = _mapper.Map<UserProfile>(user);
+
+            return Ok(ResponseDto<UserProfile>.Ok(profile));
+        }
     }
 }

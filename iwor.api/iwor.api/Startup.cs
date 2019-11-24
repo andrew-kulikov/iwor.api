@@ -80,7 +80,7 @@ namespace iwor.api
                 //The generated Swagger JSON file will have these properties.
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "Swagger XML Api Demo",
+                    Title = "iWor API Administrator",
                     Version = "v1"
                 });
                 var securityDefinition = new OpenApiSecurityScheme
@@ -143,7 +143,7 @@ namespace iwor.api
             app.UseAuthorization();
 
             app.UseSwagger();
-            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"); });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Admin V1"); });
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
