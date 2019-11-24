@@ -63,12 +63,17 @@ namespace iwor.api.Controllers
         [Route("{id}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var user = await _repository.GetByIdAsync(id);
 
-            if (user == null) return NotFound();
+            if (user == null)
+                return StatusCode(404, ResponseDto<int>.NotFound("Пользователя с таким id не существует"));
+
+            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            if (isAdmin) StatusCode(400, ResponseDto<int>.BadRequest("Невозможно удалить администратора"));
 
             var result = await _userManager.DeleteAsync(user);
 

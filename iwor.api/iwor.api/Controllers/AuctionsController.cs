@@ -131,6 +131,28 @@ namespace iwor.api.Controllers
             return Ok(ResponseDto<AuctionDto>.Ok(dto));
         }
 
+        [HttpDelete]
+        [Route("open/{id}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuctionDto))]
+        public async Task<ActionResult> Close(Guid id)
+        {
+            var auction = await _repository.GetByIdAsync(id);
+
+            if (auction == null) return StatusCode(404, ResponseDto<int>.NotFound("Auction not found"));
+
+            if (auction.Status == AuctionStatus.Open)
+            {
+                auction.EndDate = DateTime.Now;
+                auction.Status = AuctionStatus.Closed;
+            }
+
+            await _repository.UpdateAsync(auction);
+            var result = _mapper.Map<AuctionDto>(auction);
+
+            return Ok(ResponseDto<AuctionDto>.Ok(result));
+        }
+
         [HttpPost]
         [Route("{id}/raise")]
         public async Task<ActionResult> RaisePrice(Guid id, [FromBody] NewPriceRaiseDto newPriceRaiseDto)
