@@ -25,7 +25,7 @@ export function* callHttp(...args) {
 
     const data = yield call(...args);
     
-    return data;
+    return data.result;
   } catch (err) {
     if (err.status === 401) {
       console.log(err);

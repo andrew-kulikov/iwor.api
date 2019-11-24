@@ -15,9 +15,6 @@ const HomePage = ({ classes }) => (
     <Typography variant="h4" gutterBottom component="h2">
       Hello, admin
     </Typography>
-    <Paper title="Clients">Clients</Paper>
-    <Paper title="Sensors">Sensors</Paper>
-    <Paper title="Stats">Stats</Paper>
   </Page>
 );
 

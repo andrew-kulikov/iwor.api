@@ -4,8 +4,8 @@ import { Route, Switch, BrowserRouter as Router } from 'react-router-dom';
 
 
 import Login from './pages/Login';
-import Register from './pages/Register';
 import Account from './pages/Account';
+import Home from './pages/Home';
 
 import GenericNotFound from './pages/GenericNotFound';
 
@@ -19,8 +19,9 @@ const App = props => (
     <Router>
       <>
         <Switch>
+          <Route path="/" component={Home} />
+
           <Route path="/login" component={Login} />
-          <Route path="/register" component={Register} />
           <Route path="/account" component={Account} />
 
           <Route component={GenericNotFound} />

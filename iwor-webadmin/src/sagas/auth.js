@@ -15,9 +15,9 @@ import { toastr } from 'react-redux-toastr';
 import * as messageTypes from '../constants/messageTypes';
 
 export function* login({ payload }) {
-  const { email, password } = payload;
+  const { username, password } = payload;
   try {
-    const data = yield callHttp(post, LOGIN, { email, password });
+    const data = yield callHttp(post, LOGIN, { username, password });
 
     yield put(
       loginOk({
