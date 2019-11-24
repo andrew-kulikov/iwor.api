@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -45,6 +46,7 @@ namespace iwor.api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("token")]
+        [ProducesResponseType(200, Type = typeof(TokenDto))]
         public async Task<IActionResult> CreateToken([FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -56,9 +58,20 @@ namespace iwor.api.Controllers
 
             var user = await _userManager.FindByNameAsync(loginDto.Username);
 
-            var token = new TokenDto {Token = GetToken(user)};
+            var token = new TokenDto {Token = await GetToken(user)};
 
             return Ok(ResponseDto<TokenDto>.Ok(token));
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("token/validate")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public IActionResult ValidateToken()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return Ok(ResponseDto<bool>.Ok(userId != null));
         }
 
         [Authorize]
@@ -71,7 +84,7 @@ namespace iwor.api.Controllers
                 User.Claims.Where(c => c.Properties.ContainsKey("unique_name")).Select(c => c.Value).FirstOrDefault()
             );
 
-            var token = new TokenDto {Token = GetToken(user)};
+            var token = new TokenDto {Token = await GetToken(user)};
 
             return Ok(ResponseDto<TokenDto>.Ok(token));
         }
@@ -94,9 +107,32 @@ namespace iwor.api.Controllers
 
             await _signInManager.SignInAsync(user, false);
 
-            var token = new TokenDto {Token = GetToken(user)};
+            var token = new TokenDto {Token = await GetToken(user)};
 
             return Ok(ResponseDto<TokenDto>.Ok(token));
+        }
+
+        [HttpPost]
+        [Route("register/validate")]
+        [AllowAnonymous]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> ValidateRegistration([FromBody] RegisterDto registerDto)
+        {
+            if (registerDto.Password != registerDto.PasswordConfirmation)
+                return StatusCode(400, ResponseDto<int>.BadRequest("Пароли не совпадают"));
+
+            var user = await _userManager.FindByNameAsync(registerDto.Username);
+
+            if (user != null)
+                return StatusCode(400, ResponseDto<int>.BadRequest("Пользователь с таким именем существует"));
+
+            user = await _userManager.FindByEmailAsync(registerDto.Email);
+
+            if (user != null)
+                return StatusCode(400, ResponseDto<int>.BadRequest("Пользователь с таким email существует"));
+
+            return Ok(ResponseDto<int>.Ok());
         }
 
         [Authorize]
@@ -120,17 +156,21 @@ namespace iwor.api.Controllers
             return StatusCode(400, ResponseDto<int>.BadRequest("Неверный текущий пароль"));
         }
 
-        private string GetToken(IdentityUser user)
+        private async Task<string> GetToken(ApplicationUser user)
         {
             var utcNow = DateTime.UtcNow;
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, utcNow.ToString(CultureInfo.InvariantCulture))
             };
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            claims.AddRange(roles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
 
             var signingKey =
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("Tokens:Key")));

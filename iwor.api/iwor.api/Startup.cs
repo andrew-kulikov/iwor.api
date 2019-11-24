@@ -47,6 +47,7 @@ namespace iwor.api
                         .Name)));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -116,6 +117,9 @@ namespace iwor.api
                 c.IncludeXmlComments(xmlPath);
             });
 
+            //services.AddTransient<IEmailSender, EmailSender>();
+            //services.Configure<AuthMessageSenderOptions>(Configuration);
+
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped(typeof(ISpecification<>), typeof(BaseSpecification<>));
 
@@ -140,6 +144,8 @@ namespace iwor.api
                 options.AllowAnyMethod();
                 options.AllowAnyHeader();
             });
+
+            app.Use(async (context, next) => { await next(); });
 
             app.UseHttpsRedirection();
 

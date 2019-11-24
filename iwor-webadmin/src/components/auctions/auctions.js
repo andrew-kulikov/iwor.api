@@ -9,9 +9,19 @@ import Button from '@material-ui/core/Button';
 
 import { connectTo } from '../../utils';
 import { withStyles } from '@material-ui/core/styles';
-import { makeStyles } from '@material-ui/core/styles';
 
-import { getAuctions, deleteAuction } from '../../actions/auctions';
+import {
+  getAuctions,
+  deleteAuction,
+  closeAuction
+} from '../../actions/auctions';
+
+const auctionComparator = (a, b) => {
+  if (a.status > b.status) return -1;
+  if (a.status < b.status) return 1;
+
+  return 0;
+}
 
 class AuctionsPage extends React.Component {
   componentDidMount() {
@@ -19,38 +29,47 @@ class AuctionsPage extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, auctions } = this.props;
 
     return (
       <div className={classes.root}>
-        {this.props.auctions &&
-          this.props.auctions.map((a, i) => (
-            <ExpansionPanel key={i}>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography className={classes.heading}>{a.name}</Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails
-                style={{ display: 'flex', flexDirection: 'column' }}
-              >
-                <Typography>{`Id: ${a.id}`}</Typography>
-                <Typography>{`Description: ${a.description}`}</Typography>
-                <Typography>{`Start Date: ${a.startDate}`}</Typography>
-                <Typography>{`End Date: ${a.endDate}`}</Typography>
-                <Typography>{`Owner Id: ${a.ownerId}`}</Typography>
-                <Typography>{`Start Price: ${a.startPrice}`}</Typography>
-                <Typography>{`Current Price: ${a.currentPrice}`}</Typography>
-                <div>
-                  <Button onClick={e => this.props.deleteAuction(a.id)}>
-                    Delete
-                  </Button>
-                </div>
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-          ))}
+        {auctions &&
+          auctions
+            .sort(auctionComparator)
+            .map((a, i) => (
+              <ExpansionPanel key={i}>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography
+                    className={classes.heading}
+                  >{`[${a.status}] ${a.name}`}</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails
+                  style={{ display: 'flex', flexDirection: 'column' }}
+                >
+                  <Typography>{`Id: ${a.id}`}</Typography>
+                  <Typography>{`Description: ${a.description}`}</Typography>
+                  <Typography>{`Start Date: ${a.startDate}`}</Typography>
+                  <Typography>{`End Date: ${a.endDate}`}</Typography>
+                  <Typography>{`Owner Id: ${a.ownerId}`}</Typography>
+                  <Typography>{`Start Price: ${a.startPrice}`}</Typography>
+                  <Typography>{`Current Price: ${a.currentPrice}`}</Typography>
+                  <div>
+                    {a.status == 'Open' && (
+                      <Button onClick={e => this.props.closeAuction(a.id)}>
+                        Close
+                      </Button>
+                    )}
+                    <Button onClick={e => this.props.deleteAuction(a.id)}>
+                      Delete
+                    </Button>
+                  </div>
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+            ))}
       </div>
     );
   }
@@ -60,7 +79,8 @@ export default connectTo(
   state => ({ auctions: state.auctions.auctions }),
   {
     getAuctions,
-    deleteAuction
+    deleteAuction,
+    closeAuction
   },
   withStyles(theme => ({
     root: {
