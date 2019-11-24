@@ -33,9 +33,21 @@ class AuctionsPage extends React.Component {
               >
                 <Typography className={classes.heading}>{a.name}</Typography>
               </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <Typography>{a.description}</Typography>
-                <Button onClick={e => this.props.deleteAuction(a.id)}>Delete</Button>
+              <ExpansionPanelDetails
+                style={{ display: 'flex', flexDirection: 'column' }}
+              >
+                <Typography>{`Id: ${a.id}`}</Typography>
+                <Typography>{`Description: ${a.description}`}</Typography>
+                <Typography>{`Start Date: ${a.startDate}`}</Typography>
+                <Typography>{`End Date: ${a.endDate}`}</Typography>
+                <Typography>{`Owner Id: ${a.ownerId}`}</Typography>
+                <Typography>{`Start Price: ${a.startPrice}`}</Typography>
+                <Typography>{`Current Price: ${a.currentPrice}`}</Typography>
+                <div>
+                  <Button onClick={e => this.props.deleteAuction(a.id)}>
+                    Delete
+                  </Button>
+                </div>
               </ExpansionPanelDetails>
             </ExpansionPanel>
           ))}
