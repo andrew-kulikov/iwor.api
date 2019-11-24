@@ -30,5 +30,20 @@ namespace iwor.core.Services
 
             return activeAuctions;
         }
+
+        public async Task<ICollection<Auction>> GetUserOwnedAuctions(string userId)
+        {
+            var spec = new AuctionPriceRaiseSpecification();
+            var raises = await _raiseRepository.ListAsync(spec);
+
+            var activeAuctions = raises
+                .Where(r => r.Auction.Status == AuctionStatus.Closed)
+                .GroupBy(r => r.AuctionId)
+                .Where(g => g.OrderByDescending(r => r.Date).FirstOrDefault()?.RaisedUserId == userId)
+                .SelectMany(g => g.Select(r => r.Auction))
+                .ToList();
+
+            return activeAuctions;
+        }
     }
 }

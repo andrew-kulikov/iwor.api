@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,6 +11,7 @@ using iwor.core.Services;
 using iwor.core.Specifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace iwor.api.Controllers
@@ -23,14 +25,16 @@ namespace iwor.api.Controllers
         private readonly IMapper _mapper;
         private readonly IRepository<PriceRaise> _raiseRepository;
         private readonly IRepository<Auction> _repository;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public AuctionsController(IRepository<Auction> repository, IMapper mapper,
-            IRepository<PriceRaise> raiseRepository, IAuctionService auctionService)
+            IRepository<PriceRaise> raiseRepository, IAuctionService auctionService, UserManager<ApplicationUser> userManager)
         {
             _repository = repository;
             _mapper = mapper;
             _raiseRepository = raiseRepository;
             _auctionService = auctionService;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -54,6 +58,19 @@ namespace iwor.api.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var auctions = await _auctionService.GetUserActiveAuctions(userId);
+
+            var dtos = await GetDtos(auctions);
+
+            return Ok(ResponseDto<ICollection<AuctionDto>>.Ok(dtos));
+        }
+
+        [HttpGet]
+        [Route("owned")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ICollection<AuctionDto>))]
+        public async Task<IActionResult> GetOwned()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var auctions = await _auctionService.GetUserOwnedAuctions(userId);
 
             var dtos = await GetDtos(auctions);
 
@@ -118,15 +135,38 @@ namespace iwor.api.Controllers
         [Route("{id}/raise")]
         public async Task<ActionResult> RaisePrice(Guid id, [FromBody] NewPriceRaiseDto newPriceRaiseDto)
         {
+            var curLastRaise = (await _raiseRepository.ListAllAsync())
+                .Where(r => r.AuctionId == id)
+                .OrderByDescending(r => r.Date)
+                .FirstOrDefault();
+
             var raise = _mapper.Map<PriceRaise>(newPriceRaiseDto);
 
             raise.RaisedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             raise.AuctionId = id;
             raise.Date = DateTime.Now;
 
+            // FEATURE to update user balance on each price raise (automatically returns to prev user)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.Balance < raise.EndPrice)
+                return StatusCode(400, ResponseDto<int>.BadRequest("Недостаточный баланс"));
+
             var result = await _raiseRepository.AddAsync(raise);
 
             if (result == null) return BadRequest();
+
+            if (curLastRaise != null)
+            {
+                var prevUser = await _userManager.FindByIdAsync(curLastRaise.RaisedUserId);
+                prevUser.Balance += curLastRaise.EndPrice;
+                await _userManager.UpdateAsync(prevUser);
+            }
+
+            user.Balance -= raise.EndPrice;
+            await _userManager.UpdateAsync(user);
 
             var resultDto = _mapper.Map<PriceRaiseDto>(result);
             return Ok(ResponseDto<PriceRaiseDto>.Ok(resultDto));
