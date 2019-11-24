@@ -2,10 +2,9 @@ import React from 'react';
 import ReduxToastr from 'react-redux-toastr';
 import { Route, Switch, BrowserRouter as Router } from 'react-router-dom';
 
-
 import Login from './pages/Login';
-import Account from './pages/Account';
 import Home from './pages/Home';
+import Auctions from './pages/Auctions';
 
 import GenericNotFound from './pages/GenericNotFound';
 
@@ -19,10 +18,10 @@ const App = props => (
     <Router>
       <>
         <Switch>
-          <Route path="/" component={Home} />
-
+          <Route path="/auctions" component={Auctions} />
           <Route path="/login" component={Login} />
-          <Route path="/account" component={Account} />
+
+          <Route path="/" component={Home} />
 
           <Route component={GenericNotFound} />
         </Switch>

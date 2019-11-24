@@ -4,7 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router-dom';
 
 import Footer from '../containers/Footer';
-import Header from '../containers/Header';
 
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';

@@ -6,9 +6,7 @@ import Page from '../page';
 import { withStyles } from '@material-ui/core/styles';
 import { withNamespaces } from 'react-i18next';
 
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-
 
 const HomePage = ({ classes }) => (
   <Page title="Dashboard">

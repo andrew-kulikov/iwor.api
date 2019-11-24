@@ -4,20 +4,14 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
-import Link from '@material-ui/core/Link';
-import { Link as RouterLink } from 'react-router-dom';
-
 import styles from './style';
 import { connectTo } from '../../utils';
-import { withNamespaces } from 'react-i18next';
 import withStyles from '@material-ui/core/styles/withStyles';
 
 import { login } from '../../actions/auth';
@@ -51,7 +45,7 @@ class LoginPage extends React.Component {
   }
 
   render() {
-    const { classes, t } = this.props;
+    const { classes } = this.props;
 
     return (
       <main className={classes.main}>
@@ -109,5 +103,5 @@ export default connectTo(
   {
     login
   },
-  withNamespaces()(withStyles(styles)(LoginPage))
+  withStyles(styles)(LoginPage)
 );
