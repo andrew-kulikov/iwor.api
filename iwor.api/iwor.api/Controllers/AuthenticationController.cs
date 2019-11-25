@@ -5,10 +5,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Web;
 using AutoMapper;
 using iwor.api.DTOs;
 using iwor.core.Entities;
+using iwor.core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +27,7 @@ namespace iwor.api.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IEmailSender _emailSender;
         private readonly IMapper _mapper;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -31,12 +35,13 @@ namespace iwor.api.Controllers
         public AuthenticationController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IConfiguration configuration, IMapper mapper)
+            IConfiguration configuration, IMapper mapper, IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _mapper = mapper;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -90,6 +95,21 @@ namespace iwor.api.Controllers
         }
 
 
+        [HttpGet]
+        [Route("confirmation")]
+        public async Task<IActionResult> RefreshToken([FromQuery] string username, [FromQuery] string code)
+        {
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(code)) return BadRequest();
+
+            var user = await _userManager.FindByNameAsync(username);
+            var clearCode = Encoding.UTF8.GetString(Convert.FromBase64String(code)).Replace("\0", "");
+            var result = await _userManager.ConfirmEmailAsync(user, clearCode);
+
+            if (result.Succeeded) return Ok();
+
+            return BadRequest("Cannot confirm email");
+        }
+
         [HttpPost]
         [Route("register")]
         [AllowAnonymous]
@@ -105,11 +125,30 @@ namespace iwor.api.Controllers
 
             if (!identityResult.Succeeded) return BadRequest(identityResult.Errors);
 
-            await _signInManager.SignInAsync(user, false);
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var base64 = Convert.ToBase64String(Encoding.Unicode.GetBytes(code));
+            var request = ControllerContext.HttpContext.Request;
+            var uriBuilder = new UriBuilder
+            {
+                Scheme = request.Scheme,
+                Host = request.Host.Host,
+                Path = "api/auth/confirmation",
+                Query = $"username={user.UserName}&code={base64}"
+            };
+            if (request.Host.Port.HasValue) uriBuilder.Port = request.Host.Port.Value;
 
-            var token = new TokenDto {Token = await GetToken(user)};
+            var callbackUrl = uriBuilder.Uri.ToString();
 
-            return Ok(ResponseDto<TokenDto>.Ok(token));
+             _emailSender.SendEmail(registerDto.Email, "Confirm your email",
+                $"Please confirm your account by {callbackUrl} clicking here.");
+
+            return Ok(ResponseDto<int>.Ok());
+
+            //await _signInManager.SignInAsync(user, false);
+
+            //var token = new TokenDto {Token = await GetToken(user)};
+
+            //return Ok(ResponseDto<TokenDto>.Ok(token));
         }
 
         [HttpPost]
@@ -119,6 +158,15 @@ namespace iwor.api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> ValidateRegistration([FromBody] RegisterDto registerDto)
         {
+            if (string.IsNullOrEmpty(registerDto.Email))
+                return StatusCode(400, ResponseDto<int>.BadRequest("Email не может быть пуст"));
+            if (string.IsNullOrEmpty(registerDto.Username))
+                return StatusCode(400, ResponseDto<int>.BadRequest("Username не может быть пуст"));
+            if (string.IsNullOrEmpty(registerDto.Password))
+                return StatusCode(400, ResponseDto<int>.BadRequest("Пароль не может быть пуст"));
+            if (string.IsNullOrEmpty(registerDto.PasswordConfirmation))
+                return StatusCode(400, ResponseDto<int>.BadRequest("Подтверждение не может быть пусто"));
+
             if (registerDto.Password != registerDto.PasswordConfirmation)
                 return StatusCode(400, ResponseDto<int>.BadRequest("Пароли не совпадают"));
 

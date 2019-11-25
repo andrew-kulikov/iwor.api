@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,7 +47,7 @@ namespace iwor.api
                     options => options.MigrationsAssembly(typeof(ApplicationDbContext).GetTypeInfo().Assembly.GetName()
                         .Name)));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -117,8 +118,13 @@ namespace iwor.api
                 c.IncludeXmlComments(xmlPath);
             });
 
-            //services.AddTransient<IEmailSender, EmailSender>();
-            //services.Configure<AuthMessageSenderOptions>(Configuration);
+            services.Configure<RouteOptions>(options =>
+            {
+                options.LowercaseQueryStrings = true;
+            });
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped(typeof(ISpecification<>), typeof(BaseSpecification<>));
@@ -144,8 +150,6 @@ namespace iwor.api
                 options.AllowAnyMethod();
                 options.AllowAnyHeader();
             });
-
-            app.Use(async (context, next) => { await next(); });
 
             app.UseHttpsRedirection();
 
