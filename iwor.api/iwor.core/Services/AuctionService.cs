@@ -41,6 +41,7 @@ namespace iwor.core.Services
                 .GroupBy(r => r.AuctionId)
                 .Where(g => g.OrderByDescending(r => r.Date).FirstOrDefault()?.RaisedUserId == userId)
                 .SelectMany(g => g.Select(r => r.Auction))
+                .DistinctBy(a => a.Id)
                 .ToList();
 
             return activeAuctions;

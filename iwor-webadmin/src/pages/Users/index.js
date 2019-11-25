@@ -7,15 +7,15 @@ import Typography from '@material-ui/core/Typography';
 
 import { withStyles } from '@material-ui/core/styles';
 
-import Auctions from '../../components/auctions/auctions';
+import Users from '../../components/users/users';
 
-const AuctionsPage = ({ classes }) => (
+const UsersPage = ({ classes }) => (
   <Page title="Auctions">
     <Typography variant="h4" gutterBottom component="h2">
-      Auctions
+      Users
     </Typography>
-    <Auctions />
+    <Users />
   </Page>
 );
 
-export default withStyles(styles)(AuctionsPage);
+export default withStyles(styles)(UsersPage);

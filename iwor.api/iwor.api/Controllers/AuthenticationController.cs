@@ -139,8 +139,12 @@ namespace iwor.api.Controllers
 
             var callbackUrl = uriBuilder.Uri.ToString();
 
-             _emailSender.SendEmail(registerDto.Email, "Confirm your email",
-                $"Please confirm your account by {callbackUrl} clicking here.");
+            try
+            {
+                _emailSender.SendEmail(registerDto.Email, "Confirm your email",
+                   $"Please confirm your account by {callbackUrl} clicking here.");
+            }
+            catch (Exception e) { Console.WriteLine(e.Message); }
 
             return Ok(ResponseDto<int>.Ok());
 

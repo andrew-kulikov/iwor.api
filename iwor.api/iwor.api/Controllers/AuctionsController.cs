@@ -65,11 +65,10 @@ namespace iwor.api.Controllers
         }
 
         [HttpGet]
-        [Route("owned")]
+        [Route("owned/{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ICollection<AuctionDto>))]
-        public async Task<IActionResult> GetOwned()
+        public async Task<IActionResult> GetOwned(string userId)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var auctions = await _auctionService.GetUserOwnedAuctions(userId);
 
             var dtos = await GetDtos(auctions);
@@ -173,7 +172,9 @@ namespace iwor.api.Controllers
 
             var user = await _userManager.FindByIdAsync(userId);
 
-            if (user.Balance < raise.EndPrice)
+            var balance = user.Balance;
+            if (curLastRaise != null && curLastRaise.RaisedUserId == user.Id) balance += curLastRaise.EndPrice;
+            if (balance < raise.EndPrice)
                 return StatusCode(400, ResponseDto<int>.BadRequest("Недостаточный баланс"));
 
             var result = await _raiseRepository.AddAsync(raise);
@@ -190,8 +191,7 @@ namespace iwor.api.Controllers
             user.Balance -= raise.EndPrice;
             await _userManager.UpdateAsync(user);
 
-            var resultDto = _mapper.Map<PriceRaiseDto>(result);
-            return Ok(ResponseDto<PriceRaiseDto>.Ok(resultDto));
+            return Ok(ResponseDto<int>.Ok());
         }
 
         [HttpDelete]

@@ -9,12 +9,16 @@ import * as accountSagas from './account';
 import * as auctionsActions from '../actions/auctions';
 import * as auctionsSagas from './auctions';
 
+import * as usersActions from '../actions/users';
+import * as usersSagas from './users';
+
 
 export default function* saga() {
   const relations = [
     [authActions, authSagas],
     [accountActions, accountSagas],
-    [auctionsActions, auctionsSagas]
+    [auctionsActions, auctionsSagas],
+    [usersActions, usersSagas]
   ];
 
   for (const [actions, sagas] of relations) {

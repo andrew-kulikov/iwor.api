@@ -5,6 +5,7 @@ import { Route, Switch, BrowserRouter as Router } from 'react-router-dom';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Auctions from './pages/Auctions';
+import Users from './pages/Users';
 
 import GenericNotFound from './pages/GenericNotFound';
 
@@ -18,6 +19,7 @@ const App = props => (
     <Router>
       <>
         <Switch>
+          <Route path="/users" component={Users} />
           <Route path="/auctions" component={Auctions} />
           <Route path="/login" component={Login} />
 
