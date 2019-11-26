@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
@@ -54,12 +55,12 @@ namespace iwor.api.Controllers
         [ProducesResponseType(200, Type = typeof(TokenDto))]
         public async Task<IActionResult> CreateToken([FromBody] LoginDto loginDto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid) return StatusCode(400, ResponseDto<int>.BadRequest("Пароли не совпадают"));
 
             var loginResult =
                 await _signInManager.PasswordSignInAsync(loginDto.Username, loginDto.Password, false, false);
 
-            if (!loginResult.Succeeded) return BadRequest();
+            if (!loginResult.Succeeded) return StatusCode(400, ResponseDto<int>.BadRequest("Неверный пароль"));
 
             var user = await _userManager.FindByNameAsync(loginDto.Username);
 
@@ -110,6 +111,15 @@ namespace iwor.api.Controllers
             return BadRequest("Cannot confirm email");
         }
 
+        public bool ValidateCreditCard(string creditCardNumber)
+        {
+            //Build your Regular Expression
+            var expression = new Regex(@"^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$");
+
+            //Return if it was a match or not
+            return expression.IsMatch(creditCardNumber);
+        }
+
         [HttpPost]
         [Route("register")]
         [AllowAnonymous]
@@ -117,6 +127,18 @@ namespace iwor.api.Controllers
         {
             if (registerDto.Password != registerDto.PasswordConfirmation)
                 return StatusCode(400, ResponseDto<int>.BadRequest("Пароли не совпадают"));
+
+            if (!ValidateCreditCard(registerDto.CardNumber))
+                return StatusCode(400, ResponseDto<int>.BadRequest("Неверный формат номера карты"));
+
+            try
+            {
+                _mapper.Map<ApplicationUser>(registerDto);
+            }
+            catch (Exception e)
+            {
+                StatusCode(400, ResponseDto<int>.BadRequest("Неверный формат даты"));
+            }
 
             var user = _mapper.Map<ApplicationUser>(registerDto);
             user.RegistrationDate = DateTime.Now;
