@@ -97,7 +97,7 @@ namespace iwor.api.Controllers
 
         [HttpGet]
         [Route("confirmation")]
-        public async Task<IActionResult> RefreshToken([FromQuery] string username, [FromQuery] string code)
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string username, [FromQuery] string code)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(code)) return BadRequest();
 
@@ -142,7 +142,7 @@ namespace iwor.api.Controllers
             try
             {
                 _emailSender.SendEmail(registerDto.Email, "Confirm your email",
-                   $"Please confirm your account by {callbackUrl} clicking here.");
+                   $"Please confirm your account by <a href=\"{callbackUrl}\">clicking here</a>.");
             }
             catch (Exception e) { Console.WriteLine(e.Message); }
 

@@ -65,9 +65,9 @@ namespace iwor.api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(string id)
         {
-            var user = await _repository.GetByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(id);
 
             if (user == null)
                 return StatusCode(404, ResponseDto<int>.NotFound("Пользователя с таким id не существует"));

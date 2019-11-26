@@ -26,16 +26,19 @@ namespace iwor.core.Services
 
         public void SendEmail(string email, string subject, string message)
         {
-            var client = new SmtpClient("smtp.gmail.com")
-            {
-                Port = 587,
-                Credentials = new NetworkCredential("iwor.sender@gmail.com", "123qweA!"),
-                EnableSsl = true
-            };
+            using var client = new SmtpClient("smtp.gmail.com", 587);
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
+            client.EnableSsl = true;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential("iwor.sender@gmail.com", "tyjzceqwoqmobdex");
 
             var mail = new MailMessage
             {
-                From = new MailAddress("iwor.sender@gmail.com"), Subject = subject, Body = message
+                From = new MailAddress("iwor.sender@gmail.com"),
+                Subject = subject,
+                Body = message,
+                IsBodyHtml = true
             };
 
             mail.To.Add(email);
